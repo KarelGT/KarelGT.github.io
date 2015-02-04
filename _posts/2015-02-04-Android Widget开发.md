@@ -2,7 +2,7 @@
 layout: post
 title: Android Widget开发
 description: "Android Widget中使用ListView"
-modified: 2015-01-30
+modified: 2015-02-04
 tags: [Android, Widget, 开发]
 ---
 
