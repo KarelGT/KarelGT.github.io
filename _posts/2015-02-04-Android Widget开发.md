@@ -83,8 +83,8 @@ of Cells<br/>(Columns or Rows) | Available Size (dp)<br/>(minWidth or minHeight)
 1                              |40dp
 2                              |110dp
 3                              |180dp
-4                              |240dp
-…                              |…
+4                              |250dp
+…                             |…
 n                              |70 * n - 30
 
 完成之后，在`AndroidManifest.xml`注册一下
