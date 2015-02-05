@@ -90,18 +90,18 @@ n                              |70 * n - 30
 完成之后，在`AndroidManifest.xml`注册一下
 {% highlight xml %}
 <!-- Widget -->
-        <receiver
-            android:name="com.karel.days.widget.DayWidget"
-            android:icon="@drawable/ic_launcher"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
+<receiver
+    android:name="com.karel.days.widget.DayWidget"
+    android:icon="@drawable/ic_launcher"
+    android:label="@string/app_name" >
+    <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    </intent-filter>
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/day" />
-        </receiver>
+    <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/day" />
+</receiver>
 {% endhighlight %}
 其中接收的**android.appwidget.action.APPWIDGET_UPDATE**是系统发出通知Widget更新的广播。**AppWidgetProvider**中的**onReceive**会接收处理这个广播。
 
@@ -130,39 +130,37 @@ n                              |70 * n - 30
 
 {% highlight java %}
 @Override
-	public void onUpdate(Context context, AppWidgetManager appWidgetManager,
-			int[] appWidgetIds) {
-		// TODO Auto-generated method stub
-		Log.d(TAG, "enter onUpdate");
-		for (int widgetId : appWidgetIds) {
+public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+	// TODO Auto-generated method stub
+	Log.d(TAG, "enter onUpdate");
+	for (int widgetId : appWidgetIds) {
 
-			RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-					R.layout.widget_day);
-			Intent adapterIntent = new Intent(context, DayWidgetService.class);
-			// Set list's adapter
-			remoteViews.setRemoteAdapter(R.id.list_widget_content,
-					adapterIntent);
-			// views.setEmptyView(R.id.list_widget_content, R.id.tv_empty);
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+				R.layout.widget_day);
+		Intent adapterIntent = new Intent(context, DayWidgetService.class);
+		// Set list's adapter
+		remoteViews.setRemoteAdapter(R.id.list_widget_content,
+				adapterIntent);
+		// views.setEmptyView(R.id.list_widget_content, R.id.tv_empty);
 
-			// Register an onClickListener
-			Intent intent = new Intent(context, HomeActivity.class);
-			PendingIntent pendingIntent = PendingIntent.getActivity(context,
-					0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-			remoteViews.setPendingIntentTemplate(R.id.list_widget_content,
-					pendingIntent);
-			appWidgetManager.updateAppWidget(widgetId, remoteViews);
-		}
-		super.onUpdate(context, appWidgetManager, appWidgetIds);
+		// Register an onClickListener
+		Intent intent = new Intent(context, HomeActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(context,
+				0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		remoteViews.setPendingIntentTemplate(R.id.list_widget_content,
+				pendingIntent);
+		appWidgetManager.updateAppWidget(widgetId, remoteViews);
 	}
+	super.onUpdate(context, appWidgetManager, appWidgetIds);
+}
 {% endhighlight %}
 
 从中已经看到了一些比较重要的东西了，这两句就是对ListView设置Adapter。**DayWidgetService**就完成了传统ListView的Adapter作用。
 
 {% highlight java %}
 Intent adapterIntent = new Intent(context, DayWidgetService.class);
-			// Set list's adapter
-			remoteViews.setRemoteAdapter(R.id.list_widget_content,
-					adapterIntent);
+// Set list's adapter
+remoteViews.setRemoteAdapter(R.id.list_widget_content,adapterIntent);
 {% endhighlight %}
 
 那么看下**DayWidgetService**里做了些什么。
@@ -176,62 +174,62 @@ Intent adapterIntent = new Intent(context, DayWidgetService.class);
 最重要的一个方法是**getViewAt(int position)**，返回一个**RemoteViews**。和Adapter中的getView作用一样，返回ListView中一个个内容的。我的实现主要如下：
 {% highlight java %}
 @Override
-		public public RemoteViews getViewAt(int position) getViewAt(int position) {
-			// TODO Auto-generated method stub
-			if (position >= mDays.size()) {
-				Log.w(TAG, "position > mDays.size");
-				return null;
-			}
-			RemoteViews view = new RemoteViews(mContext.getPackageName(),
-					R.layout.unit_list_home_content);
+public public RemoteViews getViewAt(int position) getViewAt(int position) {
+	// TODO Auto-generated method stub
+	if (position >= mDays.size()) {
+		Log.w(TAG, "position > mDays.size");
+		return null;
+	}
+	RemoteViews view = new RemoteViews(mContext.getPackageName(),
+			R.layout.unit_list_home_content);
 
-			if (mDays != null && position < mDays.size() && mContext != null) {
-				try {
-					String name = mDays.get(position).getName();
-					int top = mDays.get(position).getTop();
-					String date = mDays.get(position).getDate();
-					view.setTextViewText(R.id.txt_unit_name, name);
-					int day = DateUtils.getInterval(mSimpleDateFormat
-							.parse(date));
-					if (day <= 0) {
-						view.setTextViewText(
-								R.id.txt_unit_date,
-								mContext.getString(R.string.past)
-										+ Math.abs(day));
-						view.setTextColor(R.id.txt_unit_date, mContext
-								.getResources().getColor(R.color.dark_yellow));
-					} else {
-						view.setTextViewText(
-								R.id.txt_unit_date,
-								mContext.getString(R.string.future)
-										+ Math.abs(day));
-						view.setTextColor(R.id.txt_unit_date, mContext
-								.getResources().getColor(R.color.dark_green));
-					}
-					if (top == CommonData.TOP_TURE) {
-						view.setViewVisibility(R.id.img_unit_top, View.VISIBLE);
-					} else {
-						view.setViewVisibility(R.id.img_unit_top,
-								View.INVISIBLE);
-					}
-					//onItemClick
-					Intent fillInIntent = new Intent();
-			        view.setOnClickFillInIntent(R.id.layout_unit_content, fillInIntent);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					Log.e(TAG, "getView", e);
-				}
+	if (mDays != null && position < mDays.size() && mContext != null) {
+		try {
+			String name = mDays.get(position).getName();
+			int top = mDays.get(position).getTop();
+			String date = mDays.get(position).getDate();
+			view.setTextViewText(R.id.txt_unit_name, name);
+			int day = DateUtils.getInterval(mSimpleDateFormat
+					.parse(date));
+			if (day <= 0) {
+				view.setTextViewText(
+						R.id.txt_unit_date,
+						mContext.getString(R.string.past)
+								+ Math.abs(day));
+				view.setTextColor(R.id.txt_unit_date, mContext
+						.getResources().getColor(R.color.dark_yellow));
+			} else {
+				view.setTextViewText(
+						R.id.txt_unit_date,
+						mContext.getString(R.string.future)
+								+ Math.abs(day));
+				view.setTextColor(R.id.txt_unit_date, mContext
+						.getResources().getColor(R.color.dark_green));
 			}
-
-			return view;
+			if (top == CommonData.TOP_TURE) {
+				view.setViewVisibility(R.id.img_unit_top, View.VISIBLE);
+			} else {
+				view.setViewVisibility(R.id.img_unit_top,
+						View.INVISIBLE);
+			}
+			//onItemClick
+			Intent fillInIntent = new Intent();
+	        view.setOnClickFillInIntent(R.id.layout_unit_content, fillInIntent);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			Log.e(TAG, "getView", e);
 		}
+	}
+
+	return view;
+}
 {% endhighlight %}
 
-还有个比较重要的就是**onDataSetChanged()**方法，用来通知数据更新。外部调用方法为
+还有个比较重要的就是**onDataSetChanged()**方法，用来通知容器数据有更新。外部调用方法为
 
 {% highlight java %}
-ppWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.list_widget_content);
+appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.list_widget_content);
 {% endhighlight %}
 
 >Collections数据刷新的流程图<br/>
@@ -243,19 +241,19 @@ ppWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.list_widget_conten
 
 {% highlight java %}
 //onItemClick
-					Intent fillInIntent = new Intent();
-			        view.setOnClickFillInIntent(R.id.layout_unit_content, fillInIntent);
+Intent fillInIntent = new Intent();
+    view.setOnClickFillInIntent(R.id.layout_unit_content, fillInIntent);
 {% endhighlight %}
 
 第二处是**DayWidget**中:
 
 {% highlight java %}
 // Register an onClickListener
-			Intent intent = new Intent(context, HomeActivity.class);
-			PendingIntent pendingIntent = PendingIntent.getActivity(context,
-					0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-			remoteViews.setPendingIntentTemplate(R.id.list_widget_content,
-					pendingIntent);
+Intent intent = new Intent(context, HomeActivity.class);
+PendingIntent pendingIntent = PendingIntent.getActivity(context,
+		0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+remoteViews.setPendingIntentTemplate(R.id.list_widget_content,
+		pendingIntent);
 {% endhighlight %}
 
 这两处就可以实现ListView的onItemClicked的作用，实现点击跳转。如果只是普通控件比如Button，只需实现第二处就行了。
