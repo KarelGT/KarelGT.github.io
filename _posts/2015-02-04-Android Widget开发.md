@@ -242,7 +242,7 @@ appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.list_widget_conte
 {% highlight java %}
 //onItemClick
 Intent fillInIntent = new Intent();
-    view.setOnClickFillInIntent(R.id.layout_unit_content, fillInIntent);
+view.setOnClickFillInIntent(R.id.layout_unit_content, fillInIntent);
 {% endhighlight %}
 
 第二处是**DayWidget**中:
