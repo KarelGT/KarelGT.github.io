@@ -14,6 +14,7 @@ tags: [Android, Widget, 开发]
 
 ##Step 1
 创建你想要的Widget的布局文件，我的为`widget_day.xml`。由于我的需求，需要在里边放一个ListView，布局就像这样
+
 {% highlight xml %}
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -31,7 +32,8 @@ tags: [Android, Widget, 开发]
 
 </RelativeLayout>
 {% endhighlight %}
->因为不是所有牛奶都叫特仑苏，所以不是所有控件都能用在Widget上的，Google官方列出了能够使用的控件。<br/>
+
+>就像不是所有牛奶都叫特仑苏一样，不是所有控件都能用在Widget上的，Google官方列出了能够使用的控件。<br/>
 A RemoteViews object (and, consequently, an App Widget) can support the following layout<br/> 
 classes:<br/>
 FrameLayout<br/>
@@ -55,11 +57,13 @@ Descendants of these classes are not supported.<br/>
 RemoteViews also supports ViewStub, which is an invisible, zero-sized View you can use to lazily inflate layout resources at runtime.
 
 创建你的Widget类，实现**AppWidgetProvider**便可以作为一个Widget了。
+
 {% highlight java %}
 public class DayWidget extends AppWidgetProvider
 {% endhighlight %}
 
 在`res`下创建`xml`文件夹，添加对于Widget属性配置的xml文件，名字随意，我这边为`day.xml`，内容大致为这样
+
 {% highlight xml %}
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
@@ -69,6 +73,7 @@ public class DayWidget extends AppWidgetProvider
     android:updatePeriodMillis="1800000" >
 </appwidget-provider>
 {% endhighlight %}
+
 这里用到的属性主要为:
 
  * **android:initialLayout** Widget的布局文件
@@ -88,6 +93,7 @@ of Cells<br/>(Columns or Rows) | Available Size (dp)<br/>(minWidth or minHeight)
 n                              |70 * n - 30
 
 完成之后，在`AndroidManifest.xml`注册一下
+
 {% highlight xml %}
 <!-- Widget -->
 <receiver
@@ -103,6 +109,7 @@ n                              |70 * n - 30
         android:resource="@xml/day" />
 </receiver>
 {% endhighlight %}
+
 其中接收的**android.appwidget.action.APPWIDGET_UPDATE**是系统发出通知Widget更新的广播。**AppWidgetProvider**中的**onReceive**会接收处理这个广播。
 
 **android:resource**就是对应的Widget属性文件。
@@ -155,7 +162,7 @@ public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] a
 }
 {% endhighlight %}
 
-从中已经看到了一些比较重要的东西了，这两句就是对ListView设置Adapter。**DayWidgetService**就完成了传统ListView的Adapter作用。
+从中已经能看到了一些比较重要的东西了，这两句就是对ListView设置Adapter。**DayWidgetService**就完成了传统ListView的Adapter作用。
 
 {% highlight java %}
 Intent adapterIntent = new Intent(context, DayWidgetService.class);
@@ -169,7 +176,9 @@ remoteViews.setRemoteAdapter(R.id.list_widget_content,adapterIntent);
 
 看起来花头都在**RemoteViewsFactory**里面!
 
-自己创建一个**DayWidgetFactory**实现**RemoteViewsService.RemoteViewsFactory**的方法。会发现这里的方法和Adapter中的惊人相似，的确这两个东西是有关联的。
+自己创建一个**DayWidgetFactory**实现**RemoteViewsService.RemoteViewsFactory**的方法。会发现这里的方法和Adapter中的惊人相似，可以被看做是一个简化版的Adapter。
+查看源码，可以看到，其实真正起作用的是**RemoteViewsFactoryAdapter**，**RemoteViewsService**的**onBind(Intent intent**会将其作为返回值。
+而**RemoteViewsFactory**会作为构造函数的一个参数传给**RemoteViewsFactoryAdapter**，在其中它的所有方法被调用。
 
 最重要的一个方法是**getViewAt(int position)**，返回一个**RemoteViews**。和Adapter中的getView作用一样，返回ListView中一个个内容的。我的实现主要如下：
 {% highlight java %}
@@ -237,6 +246,7 @@ appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.list_widget_conte
 
 ##Step 3
 最后一步是添加ListView中Item的点击事件，刚才的代码中已经能看到了，主要是两处地方。
+
 第一处是**DayWidgetService**中:
 
 {% highlight java %}
@@ -248,7 +258,7 @@ view.setOnClickFillInIntent(R.id.layout_unit_content, fillInIntent);
 第二处是**DayWidget**中:
 
 {% highlight java %}
-// Register an onClickListener
+// Register an onItemClickListener
 Intent intent = new Intent(context, HomeActivity.class);
 PendingIntent pendingIntent = PendingIntent.getActivity(context,
 		0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -256,5 +266,16 @@ remoteViews.setPendingIntentTemplate(R.id.list_widget_content,
 		pendingIntent);
 {% endhighlight %}
 
-这两处就可以实现ListView的onItemClicked的作用，实现点击跳转。如果只是普通控件比如Button，只需实现第二处就行了。
+这两处就可以实现ListView的onItemClicked的作用，实现点击跳转。
+
+如果只是普通控件比如Button，则是使用如下方法:
+
+{% highlight java %}
+// Register an onClickListener
+Intent btnIntent = new Intent(context, HomeActivity.class);
+PendingIntent pendingBtnIntent = PendingIntent.getActivity(context,
+		0, btnIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+remoteViews.setOnClickPendingIntent(R.id.img_widget_title,
+		pendingBtnIntent);
+{% endhighlight %}
 
