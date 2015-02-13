@@ -24,12 +24,11 @@ tags: [Android, Monkey, 测试]
 ##adb shell monkey -v -v -v -f [script file] [run script count]
 实现模拟触摸事件靠的就是这个啦~通过这个命令去执行脚本中定义的事件。
 * -f后面跟要调用的脚本路径，脚本需要存放在Android设备上，不是电脑上哈。
-* [run script count]是脚本执行次数
+* [run script count]是脚本执行次数。
 
 来看下我的测试脚本
 
 {% highlight %}
-<?xml version="1.0" encoding="utf-8"?>
 Start of Script
 type = user
 count= 1
