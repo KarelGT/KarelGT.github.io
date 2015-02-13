@@ -65,3 +65,5 @@ tags: [随笔, Jekyll]
 
 ###目前我也在继续摸索，不过这的确是一个很有意思的东西，以后会在这里写一些有的没的~
 写完收工，不知道这篇Hello World!能顺利部署上去不~
+
+2015-02-13 补充：有些主题需要用bundle exec jekyll build来build。bundle exec jekyll serve来run。
