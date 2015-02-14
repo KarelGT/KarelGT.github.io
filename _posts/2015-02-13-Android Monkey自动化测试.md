@@ -43,9 +43,9 @@ tags: [Android, Monkey, 测试]
 	speed= 1
 	start data >>
 	UserWait(100)
-	 **DispatchPointer** (1,1,  **0** ,  **470** ,  **750** , 0, 0, 0, 0, 0, 0, 0)
+	DispatchPointer(1, 1, 0, 470, 750, 0, 0, 0, 0, 0, 0, 0)
 	UserWait(100)
-	 **DispatchPointer** (1,1,  **1** ,  **470** ,  **750** , 0, 0, 0, 0, 0, 0, 0)
+	DispatchPointer(1, 1, 1, 470, 750, 0, 0, 0, 0, 0, 0, 0)
 {% endraw %}
 
 DispatchPointer就是触摸事件，其中第三个参数0表示按下，1表示抬起。<br/>
