@@ -54,6 +54,9 @@ DispatchPointer就是触摸事件，其中第三个参数0表示按下，1表示
 
 如果要发送Key事件的话使用*DispatchPress(KEYCODE_HOME)*，键值可以在Android API文档的[KeyEvent](http://developer.android.com/reference/android/view/KeyEvent.html)找到。
 
+##补充
+针对我这种屏幕坏掉的，还可以使用[TotalControl](http://tc.sigma-rt.com.cn/)。用PC来控制手机，更方便~
+
 >参考文档：<br/>
 [https://sites.google.com/site/terrylai14/home/android-monkey_test](https://sites.google.com/site/terrylai14/home/android-monkey_test)
 [http://developer.android.com/tools/help/monkey.html](http://developer.android.com/tools/help/monkey.html)
