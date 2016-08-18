@@ -1,9 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.karelgt.funny",
-    "sha256_cert_fingerprints":
-    ["69:97:7D:ED:BC:F8:CF:5F:E5:E5:D1:0D:0F:5A:68:65:A5:E8:26:15:34:F1:CA:26:03:74:64:82:67:76:42:CB"]
-  }
-}]
